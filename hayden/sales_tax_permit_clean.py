@@ -17,7 +17,8 @@ tax = pd.read_csv('Active_Sales_Tax_Permit_Holders.csv',
 metros_of_interest = ['Dallas-Fort Worth, TX',  
                       'Houston, TX', 
                       'Austin, TX', 
-                      'San Antonio, TX']
+                      'San Antonio, TX',
+                      'El Paso, TX']
 zri_of_interest = zri[zri['MsaName'].isin(metros_of_interest)]
 zips_of_interest = list(zri_of_interest['RegionName'].unique())
 
@@ -116,14 +117,7 @@ taxpayer_group.columns = ['year', 'month', 'zip_code',
                           'org_type_is', 'org_type_foreign', 
                           'payer_outlet_same_zipcode']
 
-# create an inexact mapping between zipcode and 
-taxpayer_zip_city = taxpayer.groupby(['Taxpayer Zip Code','Taxpayer City']
-                                     ).agg({'Taxpayer Number':'count'}
-                                           ).reset_index()
-taxpayer_zip_city.columns = ['zip_code','city','count']
-
-taxpayer_zip_city.to_csv('city_zip_init_map.csv')                                     
-                                    
+# outplut the groups for analysis
 outlet_group.to_csv('new_biz_outlet.csv')
 outlet_inside_group.to_csv('new_biz_outlet_inside.csv')
 taxpayer_group.to_csv('new_biz_taxpayer.csv')
