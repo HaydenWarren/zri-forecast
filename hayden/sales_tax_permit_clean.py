@@ -116,14 +116,58 @@ taxpayer_group.columns = ['year', 'month', 'zip_code',
                           'org_type_is', 'org_type_foreign', 
                           'payer_outlet_same_zipcode']
 
+# outplut the groups for analysis
+outlet_group.to_csv('new_biz_outlet.csv')
+outlet_inside_group.to_csv('new_biz_outlet_inside.csv')
+taxpayer_group.to_csv('new_biz_taxpayer.csv')
+
 # create an inexact mapping between zipcode and 
+taxpayer_city_corrections = {
+    'ALLAN':'ALLEN',
+    'CEDAR PARL': 'CEDAR PARK',
+    'CROSSROADS':'CROSS ROADS',
+    'CYPRESS':'HOUSTON',
+    'DESOTO':'DE SOTO',
+    'DWG':'DWG_BUTTS',
+    'EDGECLIFF VLG':'EDGECLIFF VILLAGE',
+    'FABEN':'FABEN_BUTTS',
+    'FARMERS BRNCH':'FARMERS BRANCH',
+    'FLOWERMOUND':'FLOWER MOUND',
+    'FORT  WORTH':'FORT WORTH',
+    'FOURNEY':'FORNEY',
+    'FT WORTH':'FORT WORTH',
+    'HOLLYWOOD PK':'HOLLYWOOD PARK',
+    'IVIRING':'IRVING',
+    'JERSEY VLG':'JERSEY VILLAGE',
+    'KINGWOOD':'HOUSTON',
+    'KLEIN':'KLEIN_BUTTS',
+    'LAKEWOOD VLG':'LAKEWOOD VILLAGE',
+    'MC KINNEY':'MCKINNEY',
+    'N RICHLAND HILLS':'NORTH RICHLAND HILLS',
+    'N RICHLND HLS':'NORTH RICHLAND HILLS',
+    'OAK RIDGE N':'OAK RIDGE',
+    'PROVIDNCE VLG':'PROVIDENCE VILLAGE',
+    'RICHLAND HLS':'RICHLAND HILLS',
+    'SPRING':'HOUSTON',
+    'THE WOODLANDS':'HOUSTON',
+    'UNIVERSAL CTY':'UNIVERSAL CITY',
+    'W LAKE HILLS':'WEST LAKE HILLS',
+    'WEST LAKE HLS':'WEST LAKE HILLS',
+    'WHT SETTLEMT':'WHITE SETTLEMENT',
+    'WOODLANDS':'HOUSTON'
+    }
+
+taxpayer.loc[:,'Taxpayer City'] = taxpayer.loc[:,'Taxpayer City'
+            ].map(taxpayer_city_corrections).fillna(taxpayer['Taxpayer City'])
+
 taxpayer_zip_city = taxpayer.groupby(['Taxpayer Zip Code','Taxpayer City']
                                      ).agg({'Taxpayer Number':'count'}
                                            ).reset_index()
 taxpayer_zip_city.columns = ['zip_code','city','count']
+taxpayer_zip_city.sort_values(['zip_code','count'])
+taxpayer_zip_city = taxpayer_zip_city.sort_values(['zip_code','count'],
+                                                  ascending = [True,False])
+taxpayer_zip_city = taxpayer_zip_city.drop_duplicates(subset=['zip_code'], 
+                                                      keep='first')
 
 taxpayer_zip_city.to_csv('city_zip_init_map.csv')                                     
-                                    
-outlet_group.to_csv('new_biz_outlet.csv')
-outlet_inside_group.to_csv('new_biz_outlet_inside.csv')
-taxpayer_group.to_csv('new_biz_taxpayer.csv')
