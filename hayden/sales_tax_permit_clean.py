@@ -115,6 +115,14 @@ taxpayer_group.columns = ['year', 'month', 'zip_code',
                           'city', 'org_type_cl',
                           'org_type_is', 'org_type_foreign', 
                           'payer_outlet_same_zipcode']
+
+# create an inexact mapping between zipcode and 
+taxpayer_zip_city = taxpayer.groupby(['Taxpayer Zip Code','Taxpayer City']
+                                     ).agg({'Taxpayer Number':'count'}
+                                           ).reset_index()
+taxpayer_zip_city.columns = ['zip_code','city','count']
+
+taxpayer_zip_city.to_csv('city_zip_init_map.csv')                                     
                                     
 outlet_group.to_csv('new_biz_outlet.csv')
 outlet_inside_group.to_csv('new_biz_outlet_inside.csv')
