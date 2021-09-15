@@ -32,6 +32,4 @@ zri.columns = ['zip_code', 'City', 'State', 'Time', 'zori_ssa', 'zori_ssa_diff']
 zri_merged = zri.merge(new_biz_owner, how = 'left', on=['zip_code','Time'])
 zri_merged = zri_merged.merge(new_biz_outlet, how = 'left', on=['zip_code','Time'])
 zri_merged = zri_merged.merge(sales_tax, how = 'left', on=['zip_code','Time'])
-zri_merged = zri_merged.merge(econ, how = 'left', on=['State','Time'])
-
-
+zri_merged = zri_merged.merge(econ, how = 'left', on=['zip_code','Time'])
