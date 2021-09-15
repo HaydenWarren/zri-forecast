@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Sep 14 10:33:50 2021
+Created on Wed Sep 15 11:58:35 2021
 
 @author: haydenlw4
 """
@@ -15,13 +15,15 @@ tax = pd.read_csv('Active_Sales_Tax_Permit_Holders.csv',
                   parse_dates=['Outlet First Sales Date'])
 zri = pd.read_csv('target.csv')
 
-
 # find all zipcodes for the metros that we are going to forecast.
 zips_of_interest = list(zri['RegionName'].unique())
 
 # adding month and year. shrinking the dataframe to only after 2012.
 tax.loc[:,'year'] = tax.loc[:,'Outlet First Sales Date'].dt.year
 tax = tax[tax['year']>=2012].reset_index(drop=True)
+
+taxpayer = tax[tax['Taxpayer Zip Code'].isin(zips_of_interest)]
+
 
 # using the connection between taxpayer zipcode and taxpayer city 
 # as a proxy for what city should be mapped to what zip codes. 
@@ -72,24 +74,25 @@ zip_city_map = taxpayer.groupby(['Taxpayer Zip Code','Taxpayer City']
                                 ).agg({'Taxpayer Number':'count'}
                                       ).reset_index()
 zip_city_map.columns = ['zip_code','city','count']
-# dropping city - zip code connections that aren't most frequent.
-zip_city_map = zip_city_map.sort_values(['zip_code','count'],
-                                        ascending = [True,False])
-zip_city_map = zip_city_map.drop_duplicates(subset=['zip_code'],
-                                            keep='first')
 
 # match the upper case to allow for merging and having city be the same.
 tax_rev.loc[:,'City'] = tax_rev.loc[:,'City'].str.upper()
 zip_tax_rev_wide = zip_city_map.merge(tax_rev, how='left', left_on = 'city', 
                            right_on = 'City')
-# getting df to look like i want it to with less columns and nice names.
-zip_tax_rev = zip_tax_rev_wide[['zip_code','Report Year','Report Month',
-                                'Current Rate','Net Payment This Period',
-                                'Comparable Payment Prior Year',
-                                'Percent Change From Prior Year','city']]
-zip_tax_rev.columns = ['zip_code','year','month',
-                       'sales_tax_rate','total_sales_tax',
-                       'total_sales_tax_last_year',
-                       'per_diff_total_sales_tax','city']
 
-zip_tax_rev.to_csv('sales_tax_allocation.csv')
+zip_tax_rev_wide = zip_tax_rev_wide.drop_duplicates(
+    subset=['zip_code','city','count'],keep='first')
+
+zip_county_map = zip_tax_rev_wide.groupby(['zip_code','County']).agg(
+    {'count':'sum'}).reset_index()
+
+# dropping city - zip code connections that aren't most frequent.
+zip_county_map = zip_county_map.sort_values(['zip_code','count'],
+                                        ascending = [True,False])
+zip_county_map = zip_county_map.drop_duplicates(subset=['zip_code'],
+                                            keep='first')
+
+zip_county_map = zip_county_map[['zip_code','County']]
+zip_county_map.columns = ['zip_code','county']
+
+zip_county_map.to_csv('zip_county_map.csv')
