@@ -37,6 +37,6 @@ def time_lag_merge(df_1, df_2,lag_dictionary = {}):
                                 how = 'left', on = ['zip_code','Time'], 
                                 suffixes = (None,f'_{lag}_month_shift'))
     else:
-        df_1 = df_1.merge(df_2, how = 'left', on = ['zip_code','Time'],
+        df_1_ = df_1.merge(df_2, how = 'left', on = ['zip_code','Time'],
                           suffixes = (None,'_right'))
     return df_1_
