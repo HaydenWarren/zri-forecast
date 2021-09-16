@@ -8,7 +8,7 @@ Created on Thu Sep 16 11:23:59 2021
 
 import pandas as pd
 
-def time_lag_merge(df_1, df_2,lag_dictionary):
+def time_lag_merge(df_1, df_2,lag_dictionary = {}):
     '''
     
 
@@ -28,11 +28,15 @@ def time_lag_merge(df_1, df_2,lag_dictionary):
         dataframe to have new lagged columns.
 
     '''
-    df_1_ = df_1.copy()
-    for lag in lag_dictionary.keys():
-        df_2_ = df_2.copy()
-        df_2_.loc[:,'Time'] = df_2_.loc[:,'Time'] + pd.DateOffset(months=lag)
-        df_1_ = df_1_.merge(df_2_[lag_dictionary[lag]+['zip_code','Time']], 
-                            how = 'left', on = ['zip_code','Time'], 
-                            suffixes = (None,f'_{lag}_month_shift'))
+    if lag_dictionary:
+        df_1_ = df_1.copy()
+        for lag in lag_dictionary.keys():
+            df_2_ = df_2.copy()
+            df_2_.loc[:,'Time'] = df_2_.loc[:,'Time'] + pd.DateOffset(months=lag)
+            df_1_ = df_1_.merge(df_2_[lag_dictionary[lag]+['zip_code','Time']], 
+                                how = 'left', on = ['zip_code','Time'], 
+                                suffixes = (None,f'_{lag}_month_shift'))
+    else:
+        df_1 = df_1.merge(df_2, how = 'left', on = ['zip_code','Time'],
+                          suffixes = (None,'_right'))
     return df_1_
