@@ -9,18 +9,12 @@ Created on Sun Sep 12 20:58:03 2021
 ## load packages and data sets
 import pandas as pd
 
-zri = pd.read_csv('zori.csv')
+zri = pd.read_csv('target.csv',index_col = 0)
 tax = pd.read_csv('Active_Sales_Tax_Permit_Holders.csv',
                   parse_dates=['Outlet First Sales Date'])
 
 # find all zipcodes for the metros that we are going to forecast.
-metros_of_interest = ['Dallas-Fort Worth, TX',  
-                      'Houston, TX', 
-                      'Austin, TX', 
-                      'San Antonio, TX',
-                      'El Paso, TX']
-zri_of_interest = zri[zri['MsaName'].isin(metros_of_interest)]
-zips_of_interest = list(zri_of_interest['RegionName'].unique())
+zips_of_interest = list(zri['RegionName'].unique())
 
 # exporting the zip codes of interest for what we need in other places.
 # zips_of_interest_df = pd.DataFrame({'zip_codes':zips_of_interest})
@@ -66,9 +60,9 @@ outlet_group = outlet.groupby(['year','month','Outlet Zip Code']
                                      'org_type_foreign':'sum',
                                      }).reset_index()
 outlet_group.columns = ['year', 'month', 'zip_code',
-                        'city', 'taxpayer_non_tx',
-                        'org_type_cl', 'org_type_is',
-                        'org_type_foreign']   
+                        'outlet_count', 'outlet_taxpayer_non_tx',
+                        'outlet_org_type_cl', 'outlet_org_type_is',
+                        'outlet_org_type_foreign']   
                                      
 outlet_inside_group = outlet_inside.groupby(['year','month','Outlet Zip Code']
                               ).agg({'Outlet City':'count',
@@ -78,9 +72,9 @@ outlet_inside_group = outlet_inside.groupby(['year','month','Outlet Zip Code']
                                      'org_type_foreign':'sum',
                                      }).reset_index()
 outlet_inside_group.columns = ['year', 'month', 'zip_code',
-                               'city', 'taxpayer_non_tx',
-                               'org_type_cl', 'org_type_is', 
-                               'org_type_foreign']                                 
+                               'outlet_count', 'outlet_taxpayer_non_tx',
+                               'outlet_org_type_cl', 'outlet_org_type_is', 
+                               'outlet_org_type_foreign']                                 
 
 # limit tax dataset to when new sales tax permits are issued to taxpayer                 
 taxpayer = tax[tax['Taxpayer Zip Code'].isin(zips_of_interest)]
@@ -113,8 +107,8 @@ taxpayer_group = taxpayer.groupby(['year','month','Taxpayer Zip Code']
                                      'payer_outlet_same_zipcode':'sum',
                                      }).reset_index()
 taxpayer_group.columns = ['year', 'month', 'zip_code', 
-                          'city', 'org_type_cl',
-                          'org_type_is', 'org_type_foreign', 
+                          'taxpayer_count', 'taxpayer_org_type_cl',
+                          'taxpayer_org_type_is', 'taxpayer_org_type_foreign', 
                           'payer_outlet_same_zipcode']
 
 # outplut the groups for analysis

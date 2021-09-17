@@ -13,17 +13,11 @@ tax_rev = pd.read_csv(
 # zip_city_map = pd.read_csv('city_zip_init_map.csv',index_col=0)
 tax = pd.read_csv('Active_Sales_Tax_Permit_Holders.csv',
                   parse_dates=['Outlet First Sales Date'])
-zri = pd.read_csv('zori.csv')
+zri = pd.read_csv('target.csv')
 
 
 # find all zipcodes for the metros that we are going to forecast.
-metros_of_interest = ['Dallas-Fort Worth, TX',  
-                      'Houston, TX', 
-                      'Austin, TX', 
-                      'San Antonio, TX',
-                      'El Paso, TX']
-zri_of_interest = zri[zri['MsaName'].isin(metros_of_interest)]
-zips_of_interest = list(zri_of_interest['RegionName'].unique())
+zips_of_interest = list(zri['RegionName'].unique())
 
 # adding month and year. shrinking the dataframe to only after 2012.
 tax.loc[:,'year'] = tax.loc[:,'Outlet First Sales Date'].dt.year
@@ -45,7 +39,6 @@ taxpayer_city_corrections = {
     'DESOTO':'DE SOTO',
     'DWG':'DWG_BUTTS',
     'EDGECLIFF VLG':'EDGECLIFF VILLAGE',
-    'FABEN':'FABEN_BUTTS',
     'FARMERS BRNCH':'FARMERS BRANCH',
     'FLOWERMOUND':'FLOWER MOUND',
     'FORT  WORTH':'FORT WORTH',
@@ -55,7 +48,6 @@ taxpayer_city_corrections = {
     'IVIRING':'IRVING',
     'JERSEY VLG':'JERSEY VILLAGE',
     'KINGWOOD':'HOUSTON',
-    'KLEIN':'KLEIN_BUTTS',
     'LAKEWOOD VLG':'LAKEWOOD VILLAGE',
     'MC KINNEY':'MCKINNEY',
     'N RICHLAND HILLS':'NORTH RICHLAND HILLS',
@@ -81,12 +73,10 @@ zip_city_map = taxpayer.groupby(['Taxpayer Zip Code','Taxpayer City']
                                       ).reset_index()
 zip_city_map.columns = ['zip_code','city','count']
 # dropping city - zip code connections that aren't most frequent.
-zip_city_map.sort_values(['zip_code','count'])
 zip_city_map = zip_city_map.sort_values(['zip_code','count'],
                                         ascending = [True,False])
 zip_city_map = zip_city_map.drop_duplicates(subset=['zip_code'],
                                             keep='first')
-
 
 # match the upper case to allow for merging and having city be the same.
 tax_rev.loc[:,'City'] = tax_rev.loc[:,'City'].str.upper()
