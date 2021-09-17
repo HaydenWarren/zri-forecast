@@ -120,4 +120,23 @@ zip_tax_rev = date_zip_map.merge(zip_tax_rev, how = 'left',
 
 zip_tax_rev = zip_tax_rev.dropna(thresh=3)
 
-# zip_tax_rev.to_csv('sales_tax_allocation.csv')
+
+# dealing with the missing value for zipcode 76065 in march
+trouble_row_1 = zip_tax_rev[
+    zip_tax_rev['per_diff_total_sales_tax']==-100].index[0]
+zip_tax_rev.loc[trouble_row_1, 'per_diff_total_sales_tax'] = 24.19
+zip_tax_rev.loc[trouble_row_1, 'total_sales_tax'] = (
+    zip_tax_rev.loc[trouble_row_1, 'total_sales_tax_last_year']*(1.2419)
+    )
+
+trouble_row_2 = zip_tax_rev[
+    zip_tax_rev['per_diff_total_sales_tax'].isna()].index[0]
+zip_tax_rev.loc[trouble_row_2, 'total_sales_tax_last_year'] = (
+    zip_tax_rev.loc[trouble_row_1, 'total_sales_tax_last_year']*(1.2419)
+    )
+zip_tax_rev.loc[trouble_row_2, 'per_diff_total_sales_tax'] = (
+    (zip_tax_rev.loc[trouble_row_2, 'total_sales_tax'] / 
+    zip_tax_rev.loc[trouble_row_2, 'total_sales_tax_last_year']) - 1
+    ) * 100
+
+zip_tax_rev.to_csv('sales_tax_allocation.csv')
