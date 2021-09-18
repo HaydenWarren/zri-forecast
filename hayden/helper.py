@@ -37,9 +37,13 @@ def time_lag_merge(df_1, df_2,lag_dictionary = {},return_cols = False):
         for lag in lag_dictionary.keys():
             df_2_ = df_2.copy()
             df_2_.loc[:,'Time'] = df_2_.loc[:,'Time'] + pd.DateOffset(months=lag)
-            df_1_ = df_1_.merge(df_2_[lag_dictionary[lag]+['zip_code','Time']], 
-                                how = 'left', on = ['zip_code','Time'], 
-                                suffixes = (None,f'_{lag}_month_shift'))
+            df_1_ = df_1_.merge(
+                df_2_[lag_dictionary[lag]+['zip_code','Time']
+                      ].add_suffix(f'_{lag}_month_shift').rename(
+                  columns={f'Time_{lag}_month_shift':'Time',
+                           f'zip_code_{lag}_month_shift':'zip_code'}), 
+                how = 'left', 
+                on = ['zip_code','Time'])
     else:
         df_1_ = df_1.merge(df_2, how = 'left', on = ['zip_code','Time'],
                           suffixes = (None,'_right'))
