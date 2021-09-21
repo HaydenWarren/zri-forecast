@@ -56,7 +56,8 @@ features_pct_change_list = []
 
 for zip_code in feats_pct.zip_code.unique():
     individual_zip_pct = feats_pct.loc[feats_pct['zip_code']==zip_code,:
-                                       ].pct_change()
+                                       ].pct_change(periods = 12,
+                                                     limit = 6)
     individual_zip_pct.loc[:,'zip_code'] = zip_code
     features_pct_change_list.append(individual_zip_pct)
     
@@ -72,7 +73,7 @@ pct_cols = [
     'Gross Value Natural Gas Production', 
     'sap_case_shiller_index', 'taxpayer_count', 
     'taxpayer_cl_ratio', 'taxpayer_is_ratio',
-               ]
+                ]
 for pct_col in pct_cols:
     third_quatile = feats_pct.loc[:,pct_col].quantile(.75)
     date_min = pd.Timestamp(
@@ -97,3 +98,5 @@ feats_all = feats_raw.merge(feats_pct, how = 'left',
                             suffixes = (None,'_annual_pct_change'))
     
 feats_all.to_csv('merged_texas_data.csv')
+
+
