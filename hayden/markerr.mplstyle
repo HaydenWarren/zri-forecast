@@ -10,7 +10,7 @@ axes.linewidth: 3.0
 axes.titlelocation: left
 axes.titleweight: bold
 axes.titlecolor: 274456
-
+ 
 axes.spines.bottom: false
 axes.spines.top: false
 axes.spines.left: false
@@ -25,6 +25,11 @@ xtick.minor.size: 0
 ytick.major.size: 0
 ytick.minor.size: 0
 
+xtick.major.pad: 12.5
+xtick.minor.pad: 12.5
+ytick.major.pad: 12.5
+ytick.minor.pad: 12.5
+
 savefig.edgecolor: ffffff
 savefig.facecolor: ffffff
 
@@ -34,3 +39,4 @@ figure.subplot.bottom: 0.07
 figure.facecolor: ffffff
 
 text.color: 212121
+
